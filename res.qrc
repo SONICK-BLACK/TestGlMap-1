@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/back.png</file>
+        <file>img/bottom.png</file>
+        <file>img/front.png</file>
+        <file>img/left.png</file>
+        <file>img/right.png</file>
+        <file>img/skybox.png</file>
+        <file>img/top.png</file>
+        <file>fshader.glsl</file>
+        <file>vshader.glsl</file>
+    </qresource>
+</RCC>
