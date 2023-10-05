@@ -1,169 +1,221 @@
 #include "myglwidget.h"
-#include <QStringList>
 //------------------------------------------------------------------------------
-//QString img_back = QString(":/img/back.png");
-//QString img_front = QString(":/img/front.png");
-//QString img_top = QString(":/img/top.png");
-//QString img_bot = QString("");
-//QString img_left = QString("");
-//QString img_right = QString("");
-struct VertexData
-{
-    QVector3D position;
-    QVector2D texCoord;
-};
+const QString mBackImagePath = "img/back.png";
+const QString mRightImagePath = "img/right.png";
+const QString mLeftImagePath =  "img/left.png";
+const QString mTopImagePath = "img/top.png";
+const QString mBottomImagePath = "img/bottom.png";
+const QString mFrontImagePath = "img/font.png";
 //------------------------------------------------------------------------------
-MyGlWidget::MyGlWidget(QWidget *parent)
-    : QGLWidget(parent)
+MyGlWidget::MyGlWidget(QWidget *parent) : QGLWidget(parent)
 {    
+    //определим парамтеры пртрици пердставления
+    mLookAt.eye =    {0.0f, 0.0f, 0.0f};
+    mLookAt.center = {0.0f, 0.0f, -1.0f};
+    mLookAt.up =     {0.0f, 1.0f, 0.0f};
+
+    setFocus();
 }
 //------------------------------------------------------------------------------
 MyGlWidget::~MyGlWidget()
 {
     arrayBuf.destroy();
     indexBuf.destroy();
+
+    delete texture;
 }
 //------------------------------------------------------------------------------
-//инициализируем фугкиции opnenGl,
-//создаем  обьекты класса геометрических памрамтеров,
-// компилируем шейдерные прогрмммы
-//------------------------------------------------------------------------------
-void MyGlWidget::initializeGL()
-{
-    glClearColor(0, 0, 0, 1);
-
-    //создаем тесутруу
-    QGLFunctions *f = context()->functions();
-
-    glEnable(GL_TEXTURE_2D);
-    f->glActiveTexture(GL_TEXTURE0);
-
-    glGenTextures(1, &CurTexture);
-    glBindTexture(GL_TEXTURE_2D, CurTexture);
-
-    QImage mtez(100, 100, QImage::Format_ARGB32);
-    mtez.fill(Qt::blue);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mtez.width(), mtez.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (uchar*)mtez.scanLine(0));
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);//GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);//GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-//    QGLShader *tex_v_shader = new QGLShader(QGLShader::Vertex);
-//    tex_v_shader->compileSourceFile(":/vshader.glsl");
-
-//    QGLShader *tex_f_shader = new QGLShader(QGLShader::Fragment);
-//    tex_f_shader->compileSourceFile(":/fshader.glsl");
-
-//    // компилируем шейдеры
-//    tex_ShaderProg.addShader(tex_v_shader);
-//    tex_ShaderProg.addShader(tex_f_shader);
-//    tex_ShaderProg.link();
-
-    initShaders();
-
-    //виделим врешнные буфферы в видеопамяти
-    arrayBuf.create();
-    indexBuf.create();
-
-    //рассичтаем геметрию куба
-    initCubeGeometry();
-
-//    QStringList RoomMap = {
-//        QString(":/img/right.png"),
-//        QString(":/img/left.png"),
-//        QString(":/img/top.png"),
-//        QString(":/img/bottom.png"),
-//        QString(":/img/font.png"),
-//        QString(":/img/back.png")
-//    };
-
-
-    //создадим старнартную текстуру
-    //LoadCubeTexture(RoomMap, &CurTexture);    
-
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-}
+//колмиплируем и биндим шейдеры
 //------------------------------------------------------------------------------
 void MyGlWidget::initShaders()
 {
-    // Compile vertex shader
-    if (!tex_ShaderProg.addShaderFromSourceFile(QGLShader::Vertex, ":/vshader.glsl"))
+    //компилируем вершинные шейдер
+    if (!tex_ShaderProg.addShaderFromSourceFile(QGLShader::Vertex, ":/vshader_cube_map.glsl"))
         close();
 
-    // Compile fragment shader
-    if (!tex_ShaderProg.addShaderFromSourceFile(QGLShader::Fragment, ":/fshader.glsl"))
+    //компилириуем фрагментный шейдер
+    if (!tex_ShaderProg.addShaderFromSourceFile(QGLShader::Fragment, ":/fshader_cube_map.glsl"))
         close();
 
-    // Link shader pipeline
+    //линкуем шейдеры
     if (!tex_ShaderProg.link())
         close();
 
-    // Bind shader pipeline for use
+    //биндим шейдеры
     if (!tex_ShaderProg.bind())
         close();
 }
 //------------------------------------------------------------------------------
-//загружаем текууры для скайбокса
+//загружаем стандартную текстуру
 //------------------------------------------------------------------------------
-void MyGlWidget::LoadCubeTexture(QStringList &filename, GLuint *target)
+void MyGlWidget::initTexure()
 {
-    //ситчаем данные файлво в соответсвующие QIMAge
-//    QList<QImage> images;
+    texture = new QOpenGLTexture(QImage(":/img/back.png").mirrored());
 
-//    for (int i = 0; i <6; i++)
-//    {
-//        QImage img = QImage(filename.at(i));
-//        images.append(img);
-//    }
+    // Set nearest filtering mode for texture minification
+    texture->setMinificationFilter(QOpenGLTexture::Nearest);
 
-    QGLFunctions *f = context()->functions();
+    // Set bilinear filtering mode for texture magnification
+    texture->setMagnificationFilter(QOpenGLTexture::Linear);
 
-    //выделям в видеопамяти месото под текстуру с указаным хендлом
-    glGenTextures(1, target);
-    //биндм текстурур
-    glBindTexture(GL_TEXTURE_CUBE_MAP, *target);
-    f->glActiveTexture(GL_TEXTURE0);
-
-    //утсанвливаем парметр, помогающий избежать артефактов на границе тексур
-    //при отрисвоке с помощью линейной интерполяции
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_NEAREST);
-    //параметр MAG фильтр определяютс поведение текстур ы при растягивании
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    //ширину и высоту берем по первому изобрадению
-    //ибо текстуры имеют одинаковый размере
-//        int width = images.at(0).width();
-//        int height = images.at(0).height();
-    //int cnt = 0;
-
-    QImage mming(100, 100, QImage::Format_ARGB32);
-    mming.fill(Qt::blue);
-    int width = mming.width();
-    int height = mming.height();
-    uchar *data;
-
-    //загружаем данные тексуры в видеопамять
-//    for (int i = 0; i < 6; i++)
-//    {
-        data = (uchar*)mming.scanLine(0);
-        //POSITIVE_X - код правой грани текстуры,
-        //все последующеи коды идут подряд
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-                     0, GL_RGB, width, height,
-                     0, GL_RGBA,
-                     GL_UNSIGNED_BYTE, data);
-
-    //}
-
-    //glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    // Wrap texture coordinates by repeating
+    // f.ex. texture coordinate (1.1, 1.2) is same as (0.1, 0.2)
+    texture->setWrapMode(QOpenGLTexture::Repeat);
 }
 //------------------------------------------------------------------------------
-//инициализируем геметрию куба
+//загружаем стандартную текууру для скайбокса
+//------------------------------------------------------------------------------
+void MyGlWidget::LoadCubeTexture()
+{
+    //создаем QIMage для каждой грани (x pos/ neg, y pos/ neg, z pos/ neg)
+//    const QImage posx = QImage(mRightImagePath).convertToFormat(QImage::Format_RGBA8888);
+//    const QImage negx = QImage(mLeftImagePath).convertToFormat(QImage::Format_RGBA8888);
+
+//    const QImage posy = QImage(mTopImagePath).convertToFormat(QImage::Format_RGBA8888);
+//    const QImage negy = QImage(mBottomImagePath).convertToFormat(QImage::Format_RGBA8888);
+
+//    const QImage posz = QImage(mFrontImagePath).convertToFormat(QImage::Format_RGBA8888);
+//    const QImage negz = QImage(mBackImagePath).convertToFormat(QImage::Format_RGBA8888);
+
+    const int width = 100;
+    const int height = 100;
+
+    QImage posx = QImage(width, height, QImage::Format_RGBA8888);
+    posx.fill(Qt::green);
+    QImage negx = QImage(width, height, QImage::Format_RGBA8888);
+    negx.fill(Qt::green);
+
+    QImage posy = QImage(width, height, QImage::Format_RGBA8888);
+    posy.fill(Qt::green);
+    QImage negy = QImage(width, height, QImage::Format_RGBA8888);
+    negy.fill(Qt::green);
+
+    QImage posz = QImage(width, height, QImage::Format_RGBA8888);
+    posz.fill(Qt::green);
+    QImage negz = QImage(width, height, QImage::Format_RGBA8888);
+    negz.fill(Qt::green);
+
+    //texture = new QOpenGLTexture(QOpenGLTexture::TargetCubeMap);
+
+//    texture->create();
+//    texture->setSize(width, height);
+//    texture->setFormat(QOpenGLTexture::RGBA8_UNorm);
+//    texture->allocateStorage();
+//    hdTexture = texture->textureId();
+//    qDebug() << "hetx" << hdTexture;
+
+    //создаем тестуру в видеопамяти
+    glGenTextures(1, &hdTexture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, hdTexture);
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+
+    //гризми тексутуру для каждой из шести гранией куба
+   glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, posx.constBits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, negx.constBits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, posy.constBits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, negy.constBits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, posz.constBits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, negz.constBits());
+
+    //texture->bind();
+//    texture->setWrapMode(QOpenGLTexture::ClampToEdge);
+//    texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+//    texture->setMagnificationFilter(QOpenGLTexture::LinearMipMapLinear);
+
+//    //загржаем данные изображения грани в соответсвующий участок текстуры
+//    texture->setData(0, 0, QOpenGLTexture::CubeMapPositiveX,
+//                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+//                     posx.constBits(), Q_NULLPTR);
+
+//    texture->setData(0, 0, QOpenGLTexture::CubeMapPositiveY,
+//                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+//                     posy.constBits(), Q_NULLPTR);
+
+//    texture->setData(0, 0, QOpenGLTexture::CubeMapPositiveZ,
+//                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+//                     posz.constBits(), Q_NULLPTR);
+
+//    texture->setData(0, 0, QOpenGLTexture::CubeMapNegativeX,
+//                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+//                     negx.constBits(), Q_NULLPTR);
+
+//    texture->setData(0, 0, QOpenGLTexture::CubeMapNegativeY,
+//                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+//                     negy.constBits(), Q_NULLPTR);
+
+//    texture->setData(0, 0, QOpenGLTexture::CubeMapNegativeZ,
+//                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
+//                     negz.constBits(), Q_NULLPTR);
+
+}
+//------------------------------------------------------------------------------
+//загружаем текууру для скайбокса, по указаннаму набору файлво текстур
+//------------------------------------------------------------------------------
+void MyGlWidget::LoadCubeTexture(QString path)
+{
+
+    //создаем QIMage для каждой грани (x pos/ neg, y pos/ neg, z pos/ neg)
+    //для каждой грани указаываем название соотвестувющего файла,
+    //название формируется в фомрате path +  top, bottom ...
+
+    const QImage posx = QImage(path + "/top.png").convertToFormat(QImage::Format_RGBA8888);
+    const QImage negx = QImage(path + "/right.png").convertToFormat(QImage::Format_RGBA8888);
+
+    const QImage posy = QImage(path + "/left.png").convertToFormat(QImage::Format_RGBA8888);
+    const QImage negy = QImage(path + "/front.png").convertToFormat(QImage::Format_RGBA8888);
+
+    const QImage posz = QImage(path + "/bootom.png").convertToFormat(QImage::Format_RGBA8888);
+    const QImage negz = QImage(path + "/back.png").convertToFormat(QImage::Format_RGBA8888);
+
+    const int width = 100;
+    const int height = 100;
+
+    //texture = new QOpenGLTexture(QOpenGLTexture::TargetCubeMap);
+
+//    texture->create();
+//    texture->setSize(width, height);
+//    texture->setFormat(QOpenGLTexture::RGBA8_UNorm);
+//    texture->allocateStorage();
+//    hdTexture = texture->textureId();
+//    qDebug() << "hetx" << hdTexture;
+
+    //создаем тестуру в видеопамяти
+    glGenTextures(1, &hdTexture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, hdTexture);
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+
+    //гризми тексутуру для каждой из шести гранией куба
+   glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, posx.constBits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, negx.constBits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, posy.constBits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, negy.constBits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, posz.constBits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, negz.constBits());
+}
+//------------------------------------------------------------------------------
+//ниницализурем геометрию куба
 //------------------------------------------------------------------------------
 void MyGlWidget::initCubeGeometry()
 {
@@ -207,65 +259,77 @@ void MyGlWidget::initCubeGeometry()
         {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.66f, 1.0f)}  // v23
     };
 
-//    // Индексы для рисования граней куба с помощью треугольников.
-//    // Треугольники можно соединить дублированием индексов
-//    // между полосками. Если соединительные полосы расположены противоположно
-//    // порядок вершин, затем последний индекс первой полосы и первый
-//    // индекс второй полоски необходимо продублировать. Если
-//    // соединительные полосы имеют тот же порядок вершин, только последний
-//    // индекс первой полосы необходимо продублировать.
-//    GLushort indices[] = {
-//         0,  1,  2,  3,  3,     // передняя грань 0 - triangle strip ( v0,  v1,  v2,  v3)
-//         4,  4,  5,  6,  7,  7, // Face 1 - triangle strip ( v4,  v5,  v6,  v7)
-//         8,  8,  9, 10, 11, 11, // Face 2 - triangle strip ( v8,  v9, v10, v11)
-//        12, 12, 13, 14, 15, 15, // Face 3 - triangle strip (v12, v13, v14, v15)
-//        16, 16, 17, 18, 19, 19, // Face 4 - triangle strip (v16, v17, v18, v19)
-//        20, 20, 21, 22, 23      // Face 5 - triangle strip (v20, v21, v22, v23)
-//    };
-
-    // Transfer vertex data to VBO 0
     arrayBuf.bind();
     arrayBuf.allocate(vertices, 24 * sizeof(VertexData));
+}
+//------------------------------------------------------------------------------
+//иницаилизируем емоетрию сканйбокса
+//------------------------------------------------------------------------------
+void MyGlWidget::initSkyBoxGeometry()
+{
+    //в скайбоксе вершинные и текстурные координтаы совпдадают
+    QVector3D vertices[] = {
+        {-1.0f,  1.0f, -1.0f},
+        {-1.0f, -1.0f, -1.0f},
+        {1.0f, -1.0f, -1.0f},
+        {1.0f, -1.0f, -1.0f},
+        {1.0f, 1.0f, -1.0f},
+        {-1.0f, 1.0f, -1.0f},
 
-    // Transfer index data to VBO 1
-    //indexBuf.bind();
-    //indexBuf.allocate(indices, 34 * sizeof(GLushort));
+        {-1.0f, -1.0f, 1.0f},
+        {-1.0f, -1.0f, -1.0f},
+        {-1.0f, 1.0f, -1.0f},
+        {-1.0f, 1.0f, -1.0f},
+        {-1.0f, 1.0f, 1.0f},
+        {-1.0f, -1.0f, +1.0f},
 
+        {1.0f, -1.0f, -1.0f},
+        {1.0f, -1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, -1.0f},
+        {1.0f, -1.0f, -1.0f},
+
+        {-1.0f, -1.0f, 1.0f},
+        {-1.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f},
+        {1.0f, -1.0f, 1.0f},
+        {-1.0f, -1.0f, 1.0f},
+
+        {-1.0f, 1.0f, -1.0f},
+        {1.0f, 1.0f, -1.0f},
+        {1.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f},
+        {-1.0f, 1.0f, 1.0f},
+        {-1.0f, 1.0f, -1.0f},
+
+        {-1.0f, -1.0f, -1.0f},
+        {-1.0f, -1.0f, 1.0f},
+        {1.0f, -1.0f, -1.0f},
+        {1.0f, -1.0f, -1.0f},
+        {-1.0f, -1.0f, 1.0f},
+        {1.0f, -1.0f, 1.0f}
+
+    };
+
+
+    arrayBuf.bind();
+    arrayBuf.allocate(vertices, 36 * sizeof(QVector3D));
+
+    //генарируем массив аттриуботв заданных индксов
+    int vertexLocation = tex_ShaderProg.attributeLocation("a_position");
+    tex_ShaderProg.enableAttributeArray(vertexLocation);
+    tex_ShaderProg.setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
 }
 //------------------------------------------------------------------------------
 //процедура рисвания куба с кубичксокгй текстурой
 //------------------------------------------------------------------------------
 void MyGlWidget::drawCube()
 {
-
-    // Индексы для рисования граней куба с помощью треугольников.
-    // Треугольники можно соединить дублированием индексов
-    // между полосками. Если соединительные полосы расположены противоположно
-    // порядок вершин, затем последний индекс первой полосы и первый
-    // индекс второй полоски необходимо продублировать. Если
-    // соединительные полосы имеют тот же порядок вершин, только последний
-    // индекс первой полосы необходимо продублировать.
-    GLushort indices[] = {
-         0,  1,  2,  3,  3,     // передняя грань 0 - triangle strip ( v0,  v1,  v2,  v3)
-         4,  4,  5,  6,  7,  7, // Face 1 - triangle strip ( v4,  v5,  v6,  v7)
-         8,  8,  9, 10, 11, 11, // Face 2 - triangle strip ( v8,  v9, v10, v11)
-        12, 12, 13, 14, 15, 15, // Face 3 - triangle strip (v12, v13, v14, v15)
-        16, 16, 17, 18, 19, 19, // Face 4 - triangle strip (v16, v17, v18, v19)
-        20, 20, 21, 22, 23      // Face 5 - triangle strip (v20, v21, v22, v23)
-    };
-
-    QGLFunctions *f = context()->functions();
-
-    // загрузим текстуру А-сканов
-//    glEnable(GL_TEXTURE_2D);
-//    glClear(GL_COLOR_BUFFER_BIT); // чистим буфер
-
-//    f->glActiveTexture(GL_TEXTURE0);
-//    glBindTexture(GL_TEXTURE_2D, CurTexture);
-
     //биндим VBO
     arrayBuf.bind();
-    //indexBuf.bind();
+    indexBuf.bind();
 
     //загрузим массив координат куба
     quintptr offset = 0;
@@ -274,16 +338,48 @@ void MyGlWidget::drawCube()
     tex_ShaderProg.enableAttributeArray(vertexLocation);
     tex_ShaderProg.setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
 
-    // Offset for texture coordinate
+//    //определяем текутурные координаты
     offset += sizeof(QVector3D);
 
-    // Tell OpenGL programmable pipeline how to locate vertex texture coordinate data
     int texcoordLocation = tex_ShaderProg.attributeLocation("a_texcoord");
     tex_ShaderProg.enableAttributeArray(texcoordLocation);
     tex_ShaderProg.setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
 
+
     //рисуем куб по массиву индексов, храняще муся в VBO1
-    glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, indices);
+    glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, 0);
+}
+//------------------------------------------------------------------------------
+//процедура отсриовки скайбокса
+//------------------------------------------------------------------------------
+void MyGlWidget::drawSkyBox()
+{
+    //отоключаем буффер глубины
+    glDepthMask(GL_FALSE);
+    //рисуем куб по массиву индексов, храняще муся в VBO1
+    glDrawArrays(GL_TRIANGLES,  0, 36);
+    glDepthMask(GL_TRUE);
+}
+//------------------------------------------------------------------------------
+//инициализируем фугкиции opnenGl,
+//создаем  обьекты класса геометрических памрамтеров,
+// компилируем шейдерные прогрмммы
+//------------------------------------------------------------------------------
+void MyGlWidget::initializeGL()
+{
+    QGLFunctions *f = context()->functions();
+    f->initializeGLFunctions();
+    glClearColor(0, 0, 0, 1);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+
+    initShaders();
+    //создадим тесктуру
+    LoadCubeTexture();
+
+    //рассичтаем геметрию куба
+    arrayBuf.create();
+    initSkyBoxGeometry();
 }
 //------------------------------------------------------------------------------
 void MyGlWidget::resizeGL(int w, int h)
@@ -291,19 +387,14 @@ void MyGlWidget::resizeGL(int w, int h)
     //обновляем размеры канвы
     glViewport(0,0, w, h);
 
-    //расситчаем матрицу сиситемы коордиитат
-//    projection.setToIdentity();
-//    float k = width() / (float)height();
-//    projection.frustum(-10.1*k, 10.1, -10.1, 10.1, -10.2, 1000);
-
     qreal aspect = qreal(w) / qreal(h ? h : 1);
-    // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 3.0, zFar = 7.0, fov = 45.0;
+    const qreal zNear = 0.1, zFar = 100.0, fov = 60.0;
 
-    //загржаем едиичнуую матрицу
-    projection.setToIdentity();
-    //утсанваливае перспетивную проэкцию
-    projection.perspective(fov, aspect, zNear, zFar);
+    //утснавливаем парматреы облсти отрсивки
+    mPerspective.verticalAngle = fov;
+    mPerspective.farPlane = zFar;
+    mPerspective.nearPlane = zNear;
+    mPerspective.aspectRatio = aspect;
 
     updateGL();
 }
@@ -312,22 +403,34 @@ void MyGlWidget::paintGL()
 {
     // очщаем буфферы
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_TEXTURE_CUBE_MAP);
 
     QGLFunctions *f = context()->functions();
+    glBindTexture(GL_TEXTURE_CUBE_MAP, hdTexture);
+    //texture->bind();
+    f->glActiveTexture(GL_TEXTURE0);
 
-//    glEnable(GL_TEXTURE_2D);
-//    f->glActiveTexture(GL_TEXTURE0);
-//    glBindTexture(GL_TEXTURE_2D, CurTexture);
+    //обновляем парметры перспективной матрицы
+    static QMatrix4x4 mProjectionMat;
+    mProjectionMat.setToIdentity();
+    mProjectionMat.perspective(mPerspective.verticalAngle,
+       mPerspective.aspectRatio,
+       mPerspective.nearPlane,
+       mPerspective.farPlane);
 
-    QMatrix4x4 matrix;
-    matrix.translate(0.0, 0.0, -5.0);
-    matrix.rotate(rotate);
+    //конфигурируем мтрицу видового предсатнвления
+    //на основе позиции камеры и угла поворота    
+    static QMatrix4x4 mViewMat;
+    mViewMat.setToIdentity();
+    mViewMat.lookAt(mLookAt.eye,
+            mLookAt.center,
+            mLookAt.up);
 
-    // выведем S-скан через стандартный шейдер
-    //tex_ShaderProg.setUniformValue(0, CurTexture);
-    tex_ShaderProg.setUniformValue("mvp_matrix", projection * matrix);
+    //утснваим аттрибуты шейдера
+    tex_ShaderProg.setUniformValue("texture", 0);
+    tex_ShaderProg.setUniformValue("mvp_matrix", mProjectionMat * mViewMat);
 
-    drawCube();
+    drawSkyBox();
 }
 //------------------------------------------------------------------------------
 void MyGlWidget::mousePressEvent(QMouseEvent *event)
@@ -338,10 +441,23 @@ void MyGlWidget::mousePressEvent(QMouseEvent *event)
 //------------------------------------------------------------------------------
 void MyGlWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    xRot = 1 / M_PI * (event->pos().y() - LastPoint.y());
-    //yRot = 1 / M_PI * (event->pos().x() - LastPoint.x());
+    double x_rot = 1 / M_PI * (event->pos().y() - LastPoint.y());
+    double y_rot = 1 / M_PI * (event->pos().x() - LastPoint.x());
     QVector3D AxisX = QVector3D(1, 0, 0);
-    rotate = QQuaternion::fromAxisAndAngle(AxisX, xRot);
+    QVector3D AxisY = QVector3D(0, 1, 0);
+
+    //стчиаем кватериан как произведение кватерианов
+    //поворта вокруг каждых осей
+    QQuaternion rotate = QQuaternion::fromAxisAndAngle(AxisX, x_rot)
+            * QQuaternion::fromAxisAndAngle(AxisY, y_rot);
+
+    //рассичтаем параматреы видовой матрицы
+    QMatrix4x4 mat;
+    mat.setToIdentity();
+    mat.rotate(rotate);
+
+    mLookAt.center = {0.0f, 0.0f, -1.0f};
+    mLookAt.center = mLookAt.center * mat;
 
     updateGL();
 }
@@ -350,4 +466,48 @@ void MyGlWidget::mouseMoveEvent(QMouseEvent *event)
 //{
 
 //}
+//------------------------------------------------------------------------------
+void MyGlWidget::keyPressEvent(QKeyEvent *event)
+{
+    event->accept();
+
+    //вращем камеру вокруг оси У по часовой стрелке
+    int dir = 1;
+    static float angle = 0.0;
+
+    if (event->key() == Qt::Key_F5){
+        dir = 1;
+    }
+    else if (event->key() == Qt::Key_F6) {
+        dir = -1;
+    }
+    else return;
+
+    QVector3D AxisY = QVector3D(0, 1, 0);
+    angle += 1 / M_PI * (10*dir);
+    //считаем кватерион повората
+    QQuaternion rotate = QQuaternion::fromAxisAndAngle(AxisY, angle);
+
+    //рассичтаем параматреы видовой матрицы
+    QMatrix4x4 mat;
+    mat.setToIdentity();
+    mat.rotate(rotate);
+
+    mLookAt.center = {0.0f, 0.0f, -1.0f};
+    mLookAt.center = mLookAt.center * mat;
+
+    updateGL();
+}
+//------------------------------------------------------------------------------
+void MyGlWidget::wheelEvent(QWheelEvent *event)
+{
+    float delta = event->delta() > 0 ? -5.0f : +5.0f;
+    mPerspective.verticalAngle += delta;
+    if(mPerspective.verticalAngle < 10.0f)
+        mPerspective.verticalAngle = 10.0f;
+    else if(mPerspective.verticalAngle > 120.0f)
+        mPerspective.verticalAngle = 120.0f;
+
+    updateGL();
+}
 //------------------------------------------------------------------------------

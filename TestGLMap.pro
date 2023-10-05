@@ -27,11 +27,15 @@ CONFIG += resources_big
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    myglwidget.cpp
+    myglwidget.cpp \
+    vars.cpp \
+    mapwidget.cpp
 
 HEADERS += \
         mainwindow.h \
-    myglwidget.h
+    myglwidget.h \
+    vars.h \
+    mapwidget.h
 
 FORMS += \
         mainwindow.ui
@@ -40,3 +44,5 @@ LIBS += -lOpengl32
 
 RESOURCES += \
     res.qrc
+
+DISTFILES +=

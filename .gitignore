@@ -31,3 +31,7 @@ release/
 Makefile.Debug
 Makefile.Release
 ui_mainwindow.h
+cubeengine.cpp
+cubeengine.h
+	"cubeengine_\320\272\320\276\320\277\320\270\321\217.cpp"
+

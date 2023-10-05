@@ -10,32 +10,28 @@
 #include <QOpenGLWidget>
 #include "GL/gl.h"
 #include <qgl.h>
-
-//char *room_box[6] =
-//{
-//    "img/right.png",
-//    "img/left.png",
-//    "img/top.png",
-//    "img/bottom.png",
-//    "img/font.png",
-//    "img/back.png",
-//};
+#include <QMouseEvent>
 
 class MyGlWidget : public QGLWidget
 {
     Q_OBJECT
 public:
 
-    //QStringList RoomMap;
-    //номер текущей текстуры
 
     explicit MyGlWidget(QWidget *parent  = 0);
     ~MyGlWidget();
 
     void initShaders();
+
+    void LoadCubeTexture();
+    void LoadCubeTexture(QString path);
+    void initTexure();
+
     void initCubeGeometry();
+    void initSkyBoxGeometry();
+
     void drawCube();
-    void LoadCubeTexture(QStringList &filename, GLuint *target);
+    void drawSkyBox();
 
     void resizeGL(int w, int h) override;
     void initializeGL() override;
@@ -44,25 +40,48 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     //void mouseReleaseEvent(QMouseEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 
 private:
 
+    struct
+    {
+        float verticalAngle;
+        float aspectRatio;
+        float nearPlane;
+        float farPlane;
+    } mPerspective;
+
+    struct
+    {
+        QVector3D eye;
+        QVector3D center;
+        QVector3D up;
+    } mLookAt;
+
+    struct VertexData
+    {
+        QVector3D position;
+        QVector3D texCoord;
+    };
+
+    QOpenGLTexture  *texture;                                       //текстура кубмапап
+    GLuint          hdTexture;                                       //хендл текстуры
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
 
-    GLuint			CurTexture;									// Идентификатор текстуры А-сканов и массив данных текстуры
+    //QMatrix4x4      mViewMat;                                          //матрица камеры (полдение камаеры в простнстве, угол поворита камеры)
+    //QMatrix4x4      mProjectionMat;                                    //матрица перспектинвой проэкции облсасти отрисовки
+    //QQuaternion     rotate;                                         //кванетрион поворота
 
-    QMatrix4x4      projection;                                      //матрица системыы кооридинат
-    QQuaternion     rotate;                                         //кванетрион поворота
-
-    float xRot, yRot, zRot;
     QPoint          LastPoint;
-
-    bool  clear_flag;												// флаг рисования пустого окна - нужен при первом включении, пока считаются лучи
 
     QGLShaderProgram tex_ShaderProg;								// программа шейдеров стандартного вывода текстуры
     int				 tex_Vertexes;									// атрибуы стандартного шейдера
     int				 tex_TexCoord;
+
+    bool  clear_flag;												// флаг рисования пустого окна - нужен при первом включении, пока считаются лучи
 
 };
 

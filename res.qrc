@@ -9,5 +9,18 @@
         <file>img/top.png</file>
         <file>fshader.glsl</file>
         <file>vshader.glsl</file>
+        <file>fshader_cube_map.glsl</file>
+        <file>vshader_cube_map.glsl</file>
+        <file>img/campus_map.png</file>
+        <file>map1/pointA/back.png</file>
+        <file>map1/pointA/bottom.png</file>
+        <file>map1/pointA/front.png</file>
+        <file>map1/pointA/left.png</file>
+        <file>map1/pointA/right.png</file>
+        <file>map1/pointA/skybox.png</file>
+        <file>map1/pointA/top.png</file>
+        <file>img/campus_map_markless.png</file>
+        <file>img/free-icon-map-marker-5860579.png</file>
+        <file>img/geometka.png</file>
     </qresource>
 </RCC>
