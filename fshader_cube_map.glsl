@@ -7,11 +7,15 @@ precision mediump float;
 
 uniform samplerCube texture;
 varying vec3 v_texcoord;
+vec4 col;
 //float x, z;
 
 void main()
 {
-    gl_FragColor = textureCube(texture, v_texcoord);
+    col = textureCube(texture, v_texcoord);
+    if (col == vec4(1,0,1,1)) col = vec4(0,1,0,1);
+    gl_FragColor = col;
+
 //    //cиний
 //    if ((x < 0) && (z < 0)) {
 //        gl_FragColor = vec4(0,0,1,0);

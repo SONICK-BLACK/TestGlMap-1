@@ -5,31 +5,7 @@
 // корппус, при наличии выбранного корпуса, отрисуем схему (вид  сверзу)
 //------------------------------------------------------------------------------
 #include <QMainWindow>
-//#include "vars.h"
-//------------------------------------------------------------------------------
-//структура интерактивной точки на карте
-//------------------------------------------------------------------------------
-typedef struct
-{
-    //название (и описание ) точки
-    QString p_name;
-    //назваение директории, хранящей текстуры
-    QString texture_name;
-    //координата точки в пискелях относительно карты
-    QPoint map_point;
-
-} TMapPoint;
-//------------------------------------------------------------------------------
-//Параметры карты
-//------------------------------------------------------------------------------
-typedef struct
-{
-    //список точек
-    QList<TMapPoint> points;
-    //изобраежеиение караты
-    QString image;
-
-} TMap;
+#include "vars.h"
 //------------------------------------------------------------------------------
 namespace Ui {
 class MainWindow;
@@ -55,10 +31,14 @@ public:
 
 
 private slots:
-    void on_pushButton_clicked();
-    void ShowPoint(int point);
+    void ShowPoint(TMapPoint point);
+    void FindPoint(QString name);
+
 
     void on_toolButton_return_clicked();
+    void on_toolButton_Search_clicked(bool checked);
+
+    void on_pushButton_Search_clicked();
 
 private:
     Ui::MainWindow *ui;

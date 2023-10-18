@@ -77,32 +77,33 @@ void MyGlWidget::LoadCubeTexture()
 //    const QImage posz = QImage(mFrontImagePath).convertToFormat(QImage::Format_RGBA8888);
 //    const QImage negz = QImage(mBackImagePath).convertToFormat(QImage::Format_RGBA8888);
 
+
     const int width = 100;
     const int height = 100;
 
     QImage posx = QImage(width, height, QImage::Format_RGBA8888);
-    posx.fill(Qt::green);
+    posx.fill(Qt::blue);
     QImage negx = QImage(width, height, QImage::Format_RGBA8888);
     negx.fill(Qt::green);
 
-    QImage posy = QImage(width, height, QImage::Format_RGBA8888);
-    posy.fill(Qt::green);
-    QImage negy = QImage(width, height, QImage::Format_RGBA8888);
+    QImage posy = QImage(width, height, QImage::Format_RGB32);
+    posy.fill(Qt::red);
+    QImage negy = QImage(width, height, QImage::Format_RGB32);
     negy.fill(Qt::green);
 
-    QImage posz = QImage(width, height, QImage::Format_RGBA8888);
+    QImage posz = QImage(width, height, QImage::Format_RGB32);
     posz.fill(Qt::green);
-    QImage negz = QImage(width, height, QImage::Format_RGBA8888);
+    QImage negz = QImage(width, height, QImage::Format_RGB32);
     negz.fill(Qt::green);
 
-    //texture = new QOpenGLTexture(QOpenGLTexture::TargetCubeMap);
+    uchar data[width][height];
+    memset(data, 0x355E3B, sizeof(data));
 
+  //  texture = new QOpenGLTexture(posz);
 //    texture->create();
 //    texture->setSize(width, height);
 //    texture->setFormat(QOpenGLTexture::RGBA8_UNorm);
 //    texture->allocateStorage();
-//    hdTexture = texture->textureId();
-//    qDebug() << "hetx" << hdTexture;
 
     //создаем тестуру в видеопамяти
     glGenTextures(1, &hdTexture);
@@ -110,15 +111,15 @@ void MyGlWidget::LoadCubeTexture()
 
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     //гризми тексутуру для каждой из шести гранией куба
    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X,
              0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, posx.constBits());
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, negx.constBits());
+             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
              0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, posy.constBits());
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
@@ -129,11 +130,13 @@ void MyGlWidget::LoadCubeTexture()
              0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, negz.constBits());
 
     //texture->bind();
+
+//    texture->generateMipMaps();
 //    texture->setWrapMode(QOpenGLTexture::ClampToEdge);
 //    texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
 //    texture->setMagnificationFilter(QOpenGLTexture::LinearMipMapLinear);
 
-//    //загржаем данные изображения грани в соответсвующий участок текстуры
+    //загржаем данные изображения грани в соответсвующий участок текстуры
 //    texture->setData(0, 0, QOpenGLTexture::CubeMapPositiveX,
 //                     QOpenGLTexture::RGBA, QOpenGLTexture::UInt8,
 //                     posx.constBits(), Q_NULLPTR);
@@ -169,50 +172,50 @@ void MyGlWidget::LoadCubeTexture(QString path)
     //для каждой грани указаываем название соотвестувющего файла,
     //название формируется в фомрате path +  top, bottom ...
 
-    const QImage posx = QImage(path + "/top.png").convertToFormat(QImage::Format_RGBA8888);
-    const QImage negx = QImage(path + "/right.png").convertToFormat(QImage::Format_RGBA8888);
+//    const QImage posx = QImage(path + "/top.png").convertToFormat(QImage::Format_RGBA8888);
+//    const QImage negx = QImage(path + "/right.png").convertToFormat(QImage::Format_RGBA8888);
 
-    const QImage posy = QImage(path + "/left.png").convertToFormat(QImage::Format_RGBA8888);
-    const QImage negy = QImage(path + "/front.png").convertToFormat(QImage::Format_RGBA8888);
+//    const QImage posy = QImage(path + "/left.png").convertToFormat(QImage::Format_RGBA8888);
+//    const QImage negy = QImage(path + "/front.png").convertToFormat(QImage::Format_RGBA8888);
 
-    const QImage posz = QImage(path + "/bootom.png").convertToFormat(QImage::Format_RGBA8888);
-    const QImage negz = QImage(path + "/back.png").convertToFormat(QImage::Format_RGBA8888);
+//    const QImage posz = QImage(path + "/bootom.png").convertToFormat(QImage::Format_RGBA8888);
+//    const QImage negz = QImage(path + "/back.png").convertToFormat(QImage::Format_RGBA8888);
 
-    const int width = 100;
-    const int height = 100;
+//    const int width = 100;
+//    const int height = 100;
 
-    //texture = new QOpenGLTexture(QOpenGLTexture::TargetCubeMap);
+//    //texture = new QOpenGLTexture(QOpenGLTexture::TargetCubeMap);
 
-//    texture->create();
-//    texture->setSize(width, height);
-//    texture->setFormat(QOpenGLTexture::RGBA8_UNorm);
-//    texture->allocateStorage();
-//    hdTexture = texture->textureId();
-//    qDebug() << "hetx" << hdTexture;
+////    texture->create();
+////    texture->setSize(width, height);
+////    texture->setFormat(QOpenGLTexture::RGBA8_UNorm);
+////    texture->allocateStorage();
+////    hdTexture = texture->textureId();
+////    qDebug() << "hetx" << hdTexture;
 
-    //создаем тестуру в видеопамяти
-    glGenTextures(1, &hdTexture);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, hdTexture);
+//    //создаем тестуру в видеопамяти
+//    glGenTextures(1, &hdTexture);
+//    glBindTexture(GL_TEXTURE_CUBE_MAP, hdTexture);
 
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+//    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
 
-    //гризми тексутуру для каждой из шести гранией куба
-   glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, posx.constBits());
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, negx.constBits());
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, posy.constBits());
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, negy.constBits());
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, posz.constBits());
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, negz.constBits());
+//    //гризми тексутуру для каждой из шести гранией куба
+//   glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+//             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, posx.constBits());
+//    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+//             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, negx.constBits());
+//    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+//             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, posy.constBits());
+//    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+//             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, negy.constBits());
+//    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+//             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, posz.constBits());
+//    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+//             0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, negz.constBits());
 }
 //------------------------------------------------------------------------------
 //ниницализурем геометрию куба
@@ -369,7 +372,7 @@ void MyGlWidget::initializeGL()
 {
     QGLFunctions *f = context()->functions();
     f->initializeGLFunctions();
-    glClearColor(0, 0, 0, 1);
+    glClearColor(0, 1, 0, 1);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
@@ -401,14 +404,17 @@ void MyGlWidget::resizeGL(int w, int h)
 //------------------------------------------------------------------------------
 void MyGlWidget::paintGL()
 {
+    //makeCurrent();
+
+    QGLFunctions *f = context()->functions();
+
     // очщаем буфферы
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_TEXTURE_CUBE_MAP);
 
-    QGLFunctions *f = context()->functions();
     glBindTexture(GL_TEXTURE_CUBE_MAP, hdTexture);
-    //texture->bind();
     f->glActiveTexture(GL_TEXTURE0);
+    //texture->bind();
 
     //обновляем парметры перспективной матрицы
     static QMatrix4x4 mProjectionMat;
@@ -431,6 +437,8 @@ void MyGlWidget::paintGL()
     tex_ShaderProg.setUniformValue("mvp_matrix", mProjectionMat * mViewMat);
 
     drawSkyBox();
+
+   // swapBuffers();
 }
 //------------------------------------------------------------------------------
 void MyGlWidget::mousePressEvent(QMouseEvent *event)

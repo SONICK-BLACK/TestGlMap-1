@@ -29,13 +29,15 @@ SOURCES += \
         mainwindow.cpp \
     myglwidget.cpp \
     vars.cpp \
-    mapwidget.cpp
+    mapwidget.cpp \
+    tpopoupwidget.cpp
 
 HEADERS += \
         mainwindow.h \
     myglwidget.h \
     vars.h \
-    mapwidget.h
+    mapwidget.h \
+    tpopoupwidget.h
 
 FORMS += \
         mainwindow.ui

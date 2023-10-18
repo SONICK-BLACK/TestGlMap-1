@@ -13,11 +13,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->label_Korpus->setVisible(false);
     ui->openGLWidget->setVisible(false);
-    ui->widget_Map->setVisible(true);
+    ui->frame_Map->setVisible(true);
     //ui->label_Korpus->setScaledContents(true);
 
 
-    connect(ui->widget_Map, SIGNAL(ShowPoint(int)), this, SLOT(ShowPoint(int)));
+    //connect(ui->widget_Map, SIGNAL(ShowPoint(int)), this, SLOT(ShowPoint(int)));
+    connect(ui->widget_Map->popupWidget, SIGNAL(ShowPoint(TMapPoint)), this, SLOT(ShowPoint(TMapPoint)));
+//    connect(ui->pushButton_Search, SIGNAL(clicked(bool)), this, SLOT(FindPoint(QString&)))
+    connect(ui->lineEdit_search, SIGNAL(textChanged(QString)), this, SLOT(FindPoint(QString)));
 }
 //------------------------------------------------------------------------------
 MainWindow::~MainWindow()
@@ -30,9 +33,10 @@ MainWindow::~MainWindow()
 void MainWindow::LoadBuildParams()
 {
     QList<TMapPoint> kpoints = {
-        {QString("BAZ"), QString(":/map1/pointA"), QPoint(3530, 3800)},
-        {QString("zzz"), QString(":/map1/pointB"), QPoint(3720, 3500)},
-        {QString("Lib "), QString(":/map1/pointC"), QPoint(2130, 3480)}
+        {QString("BAZ"), QString(":/map1/pointA"), QPoint(3530, 3800), "svfgh"},
+        {QString("zzz"), QString(":/map1/pointB"), QPoint(3720, 3500), "sdggj"},
+        {QString("Lib"), QString(":/map1/pointC"), QPoint(2130, 3480), "dsfgg"},
+        {QString("Dk"), QString(":/map1/pointD"), QPoint(3180, 2850), "sfdf"}
     };
 
     CurrentMap = {
@@ -44,27 +48,57 @@ void MainWindow::LoadBuildParams()
 //------------------------------------------------------------------------------
 //выводим кубмап выбранной точки
 //------------------------------------------------------------------------------
-void MainWindow::ShowPoint(int point)
+void MainWindow::ShowPoint(TMapPoint point)
 {
-    qDebug() << "poit " << point;
-
     //загрузим текстуру тоекущей точки (метки) в графический движок
-    ui->openGLWidget->LoadCubeTexture(CurrentMap.points.at(point).texture_name);
+    ui->openGLWidget->LoadCubeTexture();
     // спрячем виджет  карты
-    ui->widget_Map->setVisible(false);
+    ui->frame_Map->setVisible(false);
     ui->openGLWidget->setVisible(true);
 
 }
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void MainWindow::FindPoint(QString point_name)
+{
+    bool have_pt = false;
+    //прореям совпдениеимени среди всех точек на катре
+    TMapPoint pt;
+    qDebug() << "p_anem " << point_name;
+    foreach (pt, CurrentMap.points)
+    {
+        qDebug() << "pt " << pt.p_name;
+        if (pt.p_name == point_name)
+        {
+            have_pt = true;
+            break;
+        }
+    }
+
+    if (have_pt)
+    {
+        ui->widget_Map->ShowPopup(pt);
+    }
+}
+//-----------------------------------------------------------------------------
 void MainWindow::on_toolButton_return_clicked()
 {
     ui->openGLWidget->setVisible(false);
-    ui->widget_Map->setVisible(true);
+    ui->frame_Map->setVisible(true);
 }
 //------------------------------------------------------------------------------
-void MainWindow::on_pushButton_clicked()
+//------------------------------------------------------------------------------
+void MainWindow::on_pushButton_Search_clicked()
 {
-
+    QString pt_name = ui->lineEdit_search->text();
+    FindPoint(pt_name);
+}
+//------------------------------------------------------------------------------
+//выосетим тескеит посика
+//------------------------------------------------------------------------------
+void MainWindow::on_toolButton_Search_clicked(bool checked)
+{
+    ui->lineEdit_search->setVisible(checked);
+    ui->pushButton_Search->setVisible(checked);
 }
 //------------------------------------------------------------------------------
 void MainWindow::resizeEvent(QResizeEvent *event)

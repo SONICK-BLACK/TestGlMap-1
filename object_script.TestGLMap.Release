@@ -1,0 +1,13 @@
+INPUT(
+./release\qrc_res.o
+./release\main.o
+./release\mainwindow.o
+./release\myglwidget.o
+./release\vars.o
+./release\mapwidget.o
+./release\tpopoupwidget.o
+./release\moc_mainwindow.o
+./release\moc_myglwidget.o
+./release\moc_mapwidget.o
+./release\moc_tpopoupwidget.o
+);

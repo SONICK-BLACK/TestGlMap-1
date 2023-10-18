@@ -7,14 +7,22 @@
 #include "mainwindow.h"
 #include <QPainter>
 #include <QMouseEvent>
+#include <QFrame>
+#include "tpopoupwidget.h"
 //------------------------------------------------------------------------------
 class MapWidget : public QWidget
 {
     Q_OBJECT
 public:
+    //всплывающий при наведении на элемент фрейм
+    TPopoupWidget *popupWidget;
+
     explicit MapWidget(QWidget *parent = nullptr);
+    ~MapWidget();
 
     void setMap(TMap *map);
+    //void ShowPopup(QPoint pt);
+    void ShowPopup(TMapPoint pt);
 
     void resizeEvent(QResizeEvent *event);
     void paintEvent(QPaintEvent *event);
@@ -26,6 +34,9 @@ private :
     QImage *SourceMapImage;
     //полигон метки
     QPolygon mark_poly;
+    //елси флаг поднят - занчит тока активаироавнна поиском
+    //сброс т возжмене тоьлок при надатии мыши
+    bool FindedPt;
 
     //коэффиценты отношения размеров
     //исходного QImage к размерам виджета

@@ -1,0 +1,13 @@
+INPUT(
+./debug\qrc_res.o
+./debug\main.o
+./debug\mainwindow.o
+./debug\myglwidget.o
+./debug\vars.o
+./debug\mapwidget.o
+./debug\tpopoupwidget.o
+./debug\moc_mainwindow.o
+./debug\moc_myglwidget.o
+./debug\moc_mapwidget.o
+./debug\moc_tpopoupwidget.o
+);

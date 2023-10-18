@@ -1,5 +1,7 @@
+
 #include "mapwidget.h"
 #include "qdebug.h"
+#include "tpopoupwidget.h"
 //------------------------------------------------------------------------------
 const QString img_mark = ":/img/geometka.png";
 //------------------------------------------------------------------------------
@@ -8,8 +10,19 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     CurrentMap = NULL;
     SourceMapImage = NULL;
     SelectedPoint = -1;
+    FindedPt = false;
+
+    popupWidget = new TPopoupWidget(this);
+    popupWidget->setWindowFlags(Qt::SplashScreen);
+    popupWidget->setMinimumSize(QSize(200, 200));
+    popupWidget->setVisible(false);
 
     setMouseTracking(true);
+}
+//------------------------------------------------------------------------------
+MapWidget::~MapWidget()
+{
+    delete popupWidget;
 }
 //------------------------------------------------------------------------------
 //загрузим параметры текущего map а
@@ -21,6 +34,27 @@ void MapWidget::setMap(TMap *map)
     {
         SourceMapImage = new QImage(CurrentMap->image);
     }
+}
+//------------------------------------------------------------------------------
+//вывсечиавем попап в уканнгой точки
+//------------------------------------------------------------------------------
+void MapWidget::ShowPopup(TMapPoint pt)
+{
+    FindedPt = true;
+
+    //переовдим координты точек в координаты вджета
+    QPoint m_point = QPoint((double)pt.map_point.x() * ImgXKoff,
+        (double)pt.map_point.y() * ImgYKoff);
+
+    m_point = QPoint(m_point.x() - popupWidget->width() / 2,
+        m_point.y() - popupWidget->height());
+
+    //обновим текущую точку
+    popupWidget->setPoint(pt);
+    popupWidget->setGeometry(QRect(mapToGlobal(m_point), popupWidget->size()));
+    popupWidget->setVisible(true);
+
+    //SelectedPoint  = true;
 }
 //------------------------------------------------------------------------------
 //обнолвяем пискмап текущего корпуса
@@ -68,6 +102,9 @@ void MapWidget::resizeEvent(QResizeEvent *event)
     ImgXKoff = (double)width() / SourceMapImage->width();
     ImgYKoff = (double)height() / SourceMapImage->height();
 
+    //утснавоим размер всплывающего виджета
+    popupWidget->setGeometry(0,0, width() / 10, height() / 10);
+
     update();
 }
 //------------------------------------------------------------------------------
@@ -76,23 +113,26 @@ void MapWidget::resizeEvent(QResizeEvent *event)
 void MapWidget::mousePressEvent(QMouseEvent *event)
 {
     //елси нажали на текущую точку
-    if (SelectedPoint >=0)
-    {
-//        QPoint c_point = QPoint(CurrentMap->points.at(SelectedPoint).map_point.x(),
-//            CurrentMap->points.at(SelectedPoint).map_point.x());
+//    if (SelectedPoint >=0)
+//    {
+////        QPoint c_point = QPoint(CurrentMap->points.at(SelectedPoint).map_point.x(),
+//        //            CurrentMap->points.at(SelectedPoint).map_point.x());
 
-//        QRect clicked_reg = QRect(event->x() + 10, event->y() + 10, 20, 20);
-//        if (clicked_reg.contains(c_point))
-//        {
-//            //излучим сигнал о нажатии
-            emit ShowPoint(SelectedPoint);
-        //}
-    }
+//        //        QRect clicked_reg = QRect(event->x() + 10, event->y() + 10, 20, 20);
+//        //        if (clicked_reg.contains(c_point))
+//        //        {
+//        //            //излучим сигнал о нажатии
+//            emit ShowPoint(SelectedPoint);
+//        //}
+//    }
+    if (FindedPt) FindedPt = false;
+
 }
 //------------------------------------------------------------------------------
 void MapWidget::mouseMoveEvent(QMouseEvent *event)
 {
     event->accept();
+    if (FindedPt) return;
 
     //определяем координату курсора отнисительно виджета с пискмапом
     QPoint clicked_pt = event->pos();
@@ -100,16 +140,13 @@ void MapWidget::mouseMoveEvent(QMouseEvent *event)
     QRect view_rect = QRect(clicked_pt.x(), clicked_pt.y(), 20, 20);
 
     int cur_point = -1;
+
     for (int i = 0; i < CurrentMap->points.length(); i++)
     {
         //переовдим координты точек в координаты вджета
         QPoint m_point = QPoint((double)CurrentMap->points.at(i).map_point.x() * ImgXKoff,
             (double)CurrentMap->points.at(i).map_point.y() * ImgYKoff);
 
-
-//        qDebug() << "point " << i << "x " << m_point.x() << "y  " << m_point.y()
-//              << "xmap " << CurrentMap->points.at(i).map_point.x() << "xkoff " << ImgXKoff;
-//            << "y " << m_point.y() << "cpx " << clicked_pt.x() << "cpy " << clicked_pt.y();
         //если курсор поапл в облатсь точки
         if (view_rect.contains(m_point))
         {
@@ -117,9 +154,15 @@ void MapWidget::mouseMoveEvent(QMouseEvent *event)
             break;
         }
     }
-    //если текущая точка измениелась
-    if (SelectedPoint != cur_point) {
-        SelectedPoint = cur_point;
-        update();
+
+    popupWidget->setVisible(cur_point != -1);
+    if (popupWidget->isVisible())
+    {
+        popupWidget->setPoint(CurrentMap->points.at(cur_point));
+        QSize w_size  = popupWidget->size();
+        QPoint w_point = QPoint(clicked_pt.x() - popupWidget->width() / 2,
+            clicked_pt.y() - popupWidget->height());
+
+        popupWidget->setGeometry(QRect(mapToGlobal(w_point), w_size));
     }
 }
