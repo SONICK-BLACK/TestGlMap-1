@@ -143,6 +143,20 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="pushButton_Z">
+        <property name="text">
+         <string>plus</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_m">
+        <property name="text">
+         <string>minud</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>

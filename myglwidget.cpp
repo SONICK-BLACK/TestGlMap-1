@@ -436,9 +436,8 @@ void MyGlWidget::paintGL()
     tex_ShaderProg.setUniformValue("texture", 0);
     tex_ShaderProg.setUniformValue("mvp_matrix", mProjectionMat * mViewMat);
 
-    drawSkyBox();
-
    // swapBuffers();
+    drawSkyBox();
 }
 //------------------------------------------------------------------------------
 void MyGlWidget::mousePressEvent(QMouseEvent *event)

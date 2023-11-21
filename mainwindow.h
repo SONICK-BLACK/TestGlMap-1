@@ -40,8 +40,14 @@ private slots:
 
     void on_pushButton_Search_clicked();
 
+//    void on_pushButton_Z_clicked();
+//    void on_pushButton_m_clicked();
+
 private:
     Ui::MainWindow *ui;
+
+signals :
+    void Scale(QPoint pt, double scale);
 
 };
 

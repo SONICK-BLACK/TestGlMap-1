@@ -23,17 +23,20 @@ public:
     void setMap(TMap *map);
     //void ShowPopup(QPoint pt);
     void ShowPopup(TMapPoint pt);
-
     void resizeEvent(QResizeEvent *event);
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 
 private :
     TMap *CurrentMap;
     QImage *SourceMapImage;
     //полигон метки
     QPolygon mark_poly;
+    //прямоугольнник отрисовываемоого учатска карыт
+    QRect VisRect;
+
     //елси флаг поднят - занчит тока активаироавнна поиском
     //сброс т возжмене тоьлок при надатии мыши
     bool FindedPt;
@@ -53,6 +56,7 @@ signals:
     void ShowPoint(int SelectedPoint);
 
 public slots:
+    void Scale(QPoint pt, double scale);
 };
 
 #endif // MAPWIDGET_H
