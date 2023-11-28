@@ -68,6 +68,8 @@ private:
 
     QOpenGLTexture  *texture;                                       //текстура кубмапап
     GLuint          hdTexture;                                       //хендл текстуры
+    QQuaternion Rotate;
+
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
 

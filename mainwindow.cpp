@@ -6,14 +6,14 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    LoadBuildParams();
+    LoadMapParams();
 
     ui->setupUi(this);
     ui->widget_Map->setMap(&CurrentMap);
 
-    ui->label_Korpus->setVisible(false);
-    ui->openGLWidget->setVisible(false);
-    ui->frame_Map->setVisible(true);
+    //ui->label_Korpus->setVisible(false);
+    ui->openGLWidget->setVisible(true);
+    ui->frame_Map->setVisible(false);
     //ui->label_Korpus->setScaledContents(true);
 
 
@@ -30,20 +30,46 @@ MainWindow::~MainWindow()
 //------------------------------------------------------------------------------
 //загружаем парматеры карты
 //------------------------------------------------------------------------------
-void MainWindow::LoadBuildParams()
+void MainWindow::LoadMapParams()
 {
     QList<TMapPoint> kpoints = {
-        {QString("BAZ"), QString(":/map1/pointA"), QPoint(3530, 3800), "svfgh"},
-        {QString("zzz"), QString(":/map1/pointB"), QPoint(3720, 3500), "sdggj"},
-        {QString("Lib"), QString(":/map1/pointC"), QPoint(2130, 3480), "dsfgg"},
-        {QString("Dk"), QString(":/map1/pointD"), QPoint(3180, 2850), "sfdf"}
+        {QString("BAZ"), QString(":/map1/pointA"), QPoint(3530, 3800), "svfgh", QString(":/map1/DSC_0200.JPG")},
+        {QString("zzz"), QString(":/map1/pointB"), QPoint(3720, 3500), "sdggj", QString(":/map1/DSC_0201.JPG")},
+        {QString("Lib"), QString(":/map1/pointC"), QPoint(2130, 3480), "dsfgg", QString(":/map1/DSC_0202.JPG")},
+        {QString("Dk"), QString(":/map1/pointD"), QPoint(3180, 2850), "sfdf", QString(":/map1/DSC_0203.JPG")}
     };
 
-    CurrentMap = {
+    TMap Kampus = {
         kpoints,
         QString(":/img/campus_map_markless.png")
     };
 
+    Maps.append(Kampus);
+
+    QList<TMapPoint> gk1_points = {
+        {QString("Вход А"), QString(":/map1/pointA"), QPoint(492, 474), "svfgh", QString(":/map_gl_fl1/p_ipt.JPG")},
+        {QString("Njxrf .."), QString(":/map1/pointB"), QPoint(713, 121), "sdggj", QString(":/map_gl_fl1/p_smth.JPG")},
+    };
+
+    TMap gk1 = {
+        gk1_points,
+        QString(":/map_gl_fl1/map_gk_fl1.png")
+    };
+    Maps.append(gk1);
+
+    TMap gk2 = {
+        QList<TMapPoint>(),
+        QString(":/map_gl_fl2/map_gk_2.png")
+    };
+    Maps.append(gk2);
+
+    TMap gk3 = {
+        QList<TMapPoint>(),
+        QString(":/map_gl_fl1/map_gk_3.png")
+    };
+    Maps.append(gk3);
+
+    CurrentMap = Maps.first();
 }
 //------------------------------------------------------------------------------
 //выводим кубмап выбранной точки
@@ -101,6 +127,31 @@ void MainWindow::on_toolButton_Search_clicked(bool checked)
     ui->pushButton_Search->setVisible(checked);
 }
 //------------------------------------------------------------------------------
+//устанвливаем соответсующус списску карту
+//------------------------------------------------------------------------------
+void MainWindow::on_comboBox_activated(int index)
+{
+    CurrentMap = Maps.at(index);
+    ui->widget_Map->setMap(&CurrentMap);
+    ui->widget_Map->update();
+}
+//------------------------------------------------------------------------------
+void MainWindow::on_pushButton_Z_clicked()
+{
+}
+//------------------------------------------------------------------------------
+void MainWindow::on_pushButton_m_clicked()
+{
+
+}
+//------------------------------------------------------------------------------
+//переходим в масштаб 1 к 1
+//------------------------------------------------------------------------------
+void MainWindow::on_pushButton_clicked()
+{
+    ui->widget_Map->mScale = 1;
+    //ui->widget_Map->
+}
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
 }

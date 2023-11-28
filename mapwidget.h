@@ -16,6 +16,7 @@ class MapWidget : public QWidget
 public:
     //всплывающий при наведении на элемент фрейм
     TPopoupWidget *popupWidget;
+    double mScale;
 
     explicit MapWidget(QWidget *parent = nullptr);
     ~MapWidget();

@@ -18,11 +18,12 @@ class MainWindow : public QMainWindow
 public:
 
     TMap CurrentMap;
+    QList<TMap> Maps;
 
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void LoadBuildParams();
+    void LoadMapParams();
 
     void resizeEvent(QResizeEvent *event);
     void mousePressEvent(QMouseEvent *event) override;
@@ -42,6 +43,14 @@ private slots:
 
 //    void on_pushButton_Z_clicked();
 //    void on_pushButton_m_clicked();
+
+    void on_pushButton_Z_clicked();
+
+    void on_pushButton_m_clicked();
+
+    void on_pushButton_clicked();
+
+    void on_comboBox_activated(int index);
 
 private:
     Ui::MainWindow *ui;

@@ -5,7 +5,6 @@
 #include <QObject>
 #include <QRect>
 //------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
 //структура интерактивной точки на карте
 //------------------------------------------------------------------------------
 typedef struct
@@ -14,10 +13,26 @@ typedef struct
     QString p_name;
     //назваение директории, хранящей текстуры
     QString texture_name;
+
     //координата точки в пискелях относительно карты
     QPoint map_point;
     //описание точки
     QString p_decsr;
+    //название файла предпоказа точки
+    QString p_preview;
+
+
+//    TMapPoint ()
+//        : p_pos(), p_name(),
+//        p_descript(), p_texFileName()
+//    {}
+//    TMapPoint (QPoint pos, QString name,
+//        QString descr, QString texPath)
+//    {
+//        p_pos = pos;
+//        p_name = name; p_descript = descr;
+//        p_texFileName = texPath;
+//    }
 
 } TMapPoint;
 //------------------------------------------------------------------------------

@@ -12,6 +12,7 @@ MapWidget::MapWidget(QWidget *parent) : QWidget(parent)
     SelectedPoint = -1;
     FindedPt = false;
     VisRect = QRect(1,1,1,1);
+    mScale = 1;
 
     popupWidget = new TPopoupWidget(this);
     popupWidget->setWindowFlags(Qt::SplashScreen);
@@ -31,12 +32,12 @@ MapWidget::~MapWidget()
 void MapWidget::setMap(TMap *map)
 {
     CurrentMap = map;
-    if (SourceMapImage == NULL)
-    {
-        SourceMapImage = new QImage(CurrentMap->image);
-        //инициализируем размер видимой области
-        VisRect = SourceMapImage->rect();
-    }
+    if (SourceMapImage != NULL)
+        delete SourceMapImage;
+
+    SourceMapImage = new QImage(CurrentMap->image);
+    //инициализируем размер видимой области
+    VisRect = SourceMapImage->rect();
 }
 //------------------------------------------------------------------------------
 //вывсечиавем попап в уканнгой точки
@@ -72,7 +73,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
     {
         if (SourceMapImage != NULL) {
             //QRect target = rect, source = SourceMapImage->rect()
-            painter.drawImage(rect(), *SourceMapImage, SourceMapImage->rect());
+            painter.drawImage(rect(), *SourceMapImage, VisRect);
         }
         \
         if (SelectedPoint >= 0)
@@ -89,7 +90,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
             QImage mark = QImage(img_mark).scaled(mw, mh);
 
             //painter.drawImage(cur_point.x() - mw/2, cur_point.y() - mh, mark);
-            painter.drawImage(rect(), mark, VisRect);
+            painter.drawImage(rect(), mark);
             painter.setPen(Qt::black);
             painter.drawText(cur_point.x(), cur_point.y() - mh -10, k_point.p_name);
 
@@ -116,20 +117,43 @@ void MapWidget::resizeEvent(QResizeEvent *event)
 //------------------------------------------------------------------------------
 void MapWidget::mousePressEvent(QMouseEvent *event)
 {
-    //елси нажали на текущую точку
-//    if (SelectedPoint >=0)
-//    {
-////        QPoint c_point = QPoint(CurrentMap->points.at(SelectedPoint).map_point.x(),
-//        //            CurrentMap->points.at(SelectedPoint).map_point.x());
+    event->accept();
+    if (FindedPt) {
+        FindedPt = false;
+        return;
+    }
 
-//        //        QRect clicked_reg = QRect(event->x() + 10, event->y() + 10, 20, 20);
-//        //        if (clicked_reg.contains(c_point))
-//        //        {
-//        //            //излучим сигнал о нажатии
-//            emit ShowPoint(SelectedPoint);
-//        //}
-//    }
-    if (FindedPt) FindedPt = false;
+    //определяем координату курсора отнисительно виджета с пискмапом
+    QPoint clicked_pt = event->pos();
+    //проверим, принадлежит - ли какой- либо точке выбранный пиксель
+    QRect view_rect = QRect(clicked_pt.x(), clicked_pt.y(), 20, 20);
+
+    int cur_point = -1;
+
+    for (int i = 0; i < CurrentMap->points.length(); i++)
+    {
+        //переовдим координты точек в координаты вджета
+        QPoint m_point = QPoint((double)CurrentMap->points.at(i).map_point.x() * ImgXKoff,
+            (double)CurrentMap->points.at(i).map_point.y() * ImgYKoff);
+
+        //если курсор поапл в облатсь точки
+        if (view_rect.contains(m_point))
+        {
+            cur_point = i;
+            break;
+        }
+    }
+
+    popupWidget->setVisible(cur_point != -1);
+    if (popupWidget->isVisible())
+    {
+        popupWidget->setPoint(CurrentMap->points.at(cur_point));
+        QSize w_size  = popupWidget->size();
+        QPoint w_point = QPoint(clicked_pt.x() - popupWidget->width() / 2,
+            clicked_pt.y() - popupWidget->height());
+
+        popupWidget->setGeometry(QRect(mapToGlobal(w_point), w_size));
+    }
 
 }
 //------------------------------------------------------------------------------
@@ -176,9 +200,12 @@ void MapWidget::mouseMoveEvent(QMouseEvent *event)
 void MapWidget::wheelEvent(QWheelEvent *event)
 {
     //определим масштаб
-    double scale = (double)event->angleDelta().x() / 15;
-   // scale = scale > 0 ? scale : 1.0 / scale;
-    qDebug() << "sclae " << scale;
+    double scale = event->angleDelta().y();
+    scale = scale > 0 ? 0.01 : -0.01;
+    mScale += scale;
+    if (mScale < 0.01) mScale = 0.01;
+
+    qDebug() << "sclae " << mScale;
 
     //устанвливаем точку приближения (координтаы видета переводим
     // в координты image)
@@ -187,11 +214,15 @@ void MapWidget::wheelEvent(QWheelEvent *event)
     VisRect.moveCenter(im_pt);
 
     //шастабируем прямоугольгик просматриваемой олбасти карты
-    VisRect.setWidth((double)VisRect.width() * scale);
-    VisRect.setHeight((double)VisRect.height() * scale);
+    VisRect.setWidth((double)width() * mScale);
+    VisRect.setHeight((double)height() * mScale);
+
+    qDebug() << "ww " << VisRect.width() << "hh " << VisRect.height();
 
     update();
 }
+//------------------------------------------------------------------------------
+//при изменеие матсшаба измением размер видимой облатси изображения
 //------------------------------------------------------------------------------
 void MapWidget::Scale(QPoint pt, double scale)
 {
@@ -201,7 +232,7 @@ void MapWidget::Scale(QPoint pt, double scale)
     VisRect.moveCenter(im_pt);
 
     //шастабируем прямоугольгик просматриваемой олбасти карты
-    VisRect.setWidth((double)VisRect.width() * scale);
+    VisRect.setWidth((double)width() * scale);
     VisRect.setHeight((double)VisRect.height() * scale);
 
     update();

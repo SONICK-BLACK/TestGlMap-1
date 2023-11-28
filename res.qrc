@@ -24,5 +24,15 @@
         <file>img/geometka.png</file>
         <file>map1/pointС/main.png</file>
         <file>map1/pointС/main1.png</file>
+        <file>map_gl_fl1/map_gk_fl1.png</file>
+        <file>map_gl_fl2/map_gk_2.png</file>
+        <file>map_gl_fl3/map_gk_3.png</file>
+        <file>map_gl_fl4/map_gk_4.png</file>
+        <file>map1/DSC_0200.JPG</file>
+        <file>map1/DSC_0201.JPG</file>
+        <file>map1/DSC_0202.JPG</file>
+        <file>map1/DSC_0203.JPG</file>
+        <file>map_gl_fl1/p_ipt.JPG</file>
+        <file>map_gl_fl1/p_smth.JPG</file>
     </qresource>
 </RCC>
