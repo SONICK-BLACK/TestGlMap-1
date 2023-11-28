@@ -17,5 +17,5 @@ void main()
     //gl_Position = a_position.xyz;
     //так как матричные преобразовния меняют только положние в простанстве (положее камеры)
     //передеем координату без проеброазрваний
-    v_texcoord = a_position.xyz;
+    v_texcoord = a_position;
 }

@@ -61,10 +61,10 @@ void MyGlWidget::initShaders()
 //------------------------------------------------------------------------------
 void MyGlWidget::initTexure()
 {
-    QImage img(QSize(10,10), QImage::Format_ARGB32);
-    img.fill(Qt::red);
+//    QImage img(QSize(10,10), QImage::Format_ARGB32);
+//    img.fill(Qt::red);
 
-    texture = new QOpenGLTexture(img.mirrored());
+    texture = new QOpenGLTexture(QImage(":/img/skybox.png").mirrored());
 
     // Set nearest filtering mode for texture minification
     texture->setMinificationFilter(QOpenGLTexture::Nearest);
@@ -187,8 +187,8 @@ void MyGlWidget::initCubeGeometry()
 
         //правая грань
         {QVector3D( 1.0f, -1.0f,  1.0f), QVector2D( 0.0f, 0.5f)}, // v4
-        {QVector3D( 1.0f, -1.0f, -1.0f), QVector2D(0.33f, 0.5f)}, // v5
-        {QVector3D( 1.0f,  1.0f,  1.0f), QVector2D(0.0f, 1.0f)},  // v6
+        {QVector3D( 1.0f,  -1.0f,  -1.0f), QVector2D(0.0f, 1.0f)},  // v5
+        {QVector3D( 1.0f, 1.0f, 1.0f), QVector2D(0.33f, 0.5f)}, // v6
         {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.33f, 1.0f)}, // v7
 
         //задняя грань
@@ -203,36 +203,28 @@ void MyGlWidget::initCubeGeometry()
         {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(0.66f, 0.5f)}, // v14
         {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(1.0f, 0.5f)},  // v15
 
-        //нижняя грань
-        {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(0.33f, 0.0f)}, // v16
-        {QVector3D( 1.0f, -1.0f, -1.0f), QVector2D(0.66f, 0.0f)}, // v17
-        {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(0.33f, 0.5f)}, // v18
-        {QVector3D( 1.0f, -1.0f,  1.0f), QVector2D(0.66f, 0.5f)}, // v19
-
         //верзняя грань
         {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(0.33f, 0.5f)}, // v20
         {QVector3D( 1.0f,  1.0f,  1.0f), QVector2D(0.66f, 0.5f)}, // v21
         {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(0.33f, 1.0f)}, // v22
-        {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.66f, 1.0f)}  // v23
-    };
+        {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.66f, 1.0f)},  // v23
 
-
-    GLushort indices[] = {
-         0,  1,  2,  3,  3,     // Face 0 - triangle strip ( v0,  v1,  v2,  v3)
-         4,  4,  5,  6,  7,  7, // Face 1 - triangle strip ( v4,  v5,  v6,  v7)
-         8,  8,  9, 10, 11, 11, // Face 2 - triangle strip ( v8,  v9, v10, v11)
-        12, 12, 13, 14, 15, 15, // Face 3 - triangle strip (v12, v13, v14, v15)
-        16, 16, 17, 18, 19, 19, // Face 4 - triangle strip (v16, v17, v18, v19)
-        20, 20, 21, 22, 23      // Face 5 - triangle strip (v20, v21, v22, v23)
+        //нижняя грань
+        {QVector3D(-1.0f, -1.0f, 1.0f), QVector2D(0.33f, 0.0f)}, // v16
+        {QVector3D( 1.0f, -1.0f, 1.0f), QVector2D(0.66f, 0.0f)}, // v17
+        {QVector3D(1.0f, -1.0f,  -1.0f), QVector2D(0.33f, 0.5f)}, // v18
+        {QVector3D( -1.0f, -1.0f,  -1.0f), QVector2D(0.66f, 0.5f)} // v19
     };
 
     // Transfer vertex data to VBO 0
     arrayBuf.bind();
     arrayBuf.allocate(vertices, 24 * sizeof(VertexData));
+    arrayBuf.release();
 
-    // Transfer index data to VBO 1
+    // Transfer index d
     indexBuf.bind();
-    indexBuf.allocate(indices, 34 * sizeof(GLushort));
+    //indexBuf.allocate(indexes.constData(), indexes.size() * sizeof(GLuint));
+    indexBuf.release();
 }
 //------------------------------------------------------------------------------
 //иницаилизируем емоетрию сканйбокса
@@ -240,50 +232,51 @@ void MyGlWidget::initCubeGeometry()
 void MyGlWidget::initSkyBoxGeometry()
 {
     //в скайбоксе вершинные и текстурные координтаы совпдадают
-//    QVector3D vertices[] = {
-//        {-1.0f,  1.0f, -1.0f},
-//        {-1.0f, -1.0f, -1.0f},
-//        {1.0f, -1.0f, -1.0f},
-//        {1.0f, -1.0f, -1.0f},
-//        {1.0f, 1.0f, -1.0f},
-//        {-1.0f, 1.0f, -1.0f},
+/*    QVector3D vertices[] = {
+        {-1.0f,  1.0f, -1.0f},
+        {-1.0f, -1.0f, -1.0f},
+        {1.0f, -1.0f, -1.0f},
+        {1.0f, -1.0f, -1.0f},
+        {1.0f, 1.0f, -1.0f},
+        {-1.0f, 1.0f, -1.0f},
 
-//        {-1.0f, -1.0f, 1.0f},
-//        {-1.0f, -1.0f, -1.0f},
-//        {-1.0f, 1.0f, -1.0f},
-//        {-1.0f, 1.0f, -1.0f},
-//        {-1.0f, 1.0f, 1.0f},
-//        {-1.0f, -1.0f, +1.0f},
+        {-1.0f, -1.0f, 1.0f},
+        {-1.0f, -1.0f, -1.0f},
+        {-1.0f, 1.0f, -1.0f},
+        {-1.0f, 1.0f, -1.0f},
+        {-1.0f, 1.0f, 1.0f},
+        {-1.0f, -1.0f, +1.0f},
 
-//        {1.0f, -1.0f, -1.0f},
-//        {1.0f, -1.0f, 1.0f},
-//        {1.0f, 1.0f, 1.0f},
-//        {1.0f, 1.0f, 1.0f},
-//        {1.0f, 1.0f, -1.0f},
-//        {1.0f, -1.0f, -1.0f},
+        {1.0f, -1.0f, -1.0f},
+        {1.0f, -1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, -1.0f},
+        {1.0f, -1.0f, -1.0f},
 
-//        {-1.0f, -1.0f, 1.0f},
-//        {-1.0f, 1.0f, 1.0f},
-//        {1.0f, 1.0f, 1.0f},
-//        {1.0f, 1.0f, 1.0f},
-//        {1.0f, -1.0f, 1.0f},
-//        {-1.0f, -1.0f, 1.0f},
+        {-1.0f, -1.0f, 1.0f},
+        {-1.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f},
+        {1.0f, -1.0f, 1.0f},
+        {-1.0f, -1.0f, 1.0f},
 
-//        {-1.0f, 1.0f, -1.0f},
-//        {1.0f, 1.0f, -1.0f},
-//        {1.0f, 1.0f, 1.0f},
-//        {1.0f, 1.0f, 1.0f},
-//        {-1.0f, 1.0f, 1.0f},
-//        {-1.0f, 1.0f, -1.0f},
+        {-1.0f, 1.0f, -1.0f},
+        {1.0f, 1.0f, -1.0f},
+        {1.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f},
+  \      {-1.0f, 1.0f, 1.0f},
+        {-1.0f, 1.0f, -1.0f},
 
-//        {-1.0f, -1.0f, -1.0f},
-//        {-1.0f, -1.0f, 1.0f},
-//        {1.0f, -1.0f, -1.0f},
-//        {1.0f, -1.0f, -1.0f},
-//        {-1.0f, -1.0f, 1.0f},
-//        {1.0f, -1.0f, 1.0f}
+        {-1.0f, -1.0f, -1.0f},
+        {-1.0f, -1.0f, 1.0f},
+        {1.0f, -1.0f, -1.0f},
+        {1.0f, -1.0f, -1.0f},
+        {-1.0f, -1.0f, 1.0f},
+        {1.0f, -1.0f, 1.0f}
 
-//    };
+    };*/
+
 
     //заполяем  указываем вершинные и  текстурные координаты для каждой точки
     VertexData vertices[] = {
@@ -324,22 +317,75 @@ void MyGlWidget::initSkyBoxGeometry()
         {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(1.0/4.0, 0)} // v22
     };
 
-
     arrayBuf.bind();
     arrayBuf.allocate(vertices, 24 * sizeof(VertexData));
-
-//    //генарируем массив аттриуботв заданных индксов
-//    int vertexLocation = tex_ShaderProg.attributeLocation("a_position");
-//    tex_ShaderProg.enableAttributeArray(vertexLocation);
-//    tex_ShaderProg.setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
+    arrayBuf.release();
 }
 //------------------------------------------------------------------------------
 //процедура рисвания куба с кубичксокгй текстурой
 //------------------------------------------------------------------------------
 void MyGlWidget::drawCube()
 {
-    //биндим VBO
+
+    //загрузим массив координат куба
+    quintptr offset = 0;
+
     arrayBuf.bind();
+
+    int vertexLocation = tex_ShaderProg.attributeLocation("a_position");
+    tex_ShaderProg.enableAttributeArray(vertexLocation);
+    tex_ShaderProg.setAttributeBuffer(vertexLocation, GL_FLOAT, offset, 3, sizeof(VertexData));
+
+//    //определяем текутурные координаты
+    offset += sizeof(QVector3D);
+
+    int texcoordLocation = tex_ShaderProg.attributeLocation("a_texcoord");
+    tex_ShaderProg.enableAttributeArray(texcoordLocation);
+    tex_ShaderProg.setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
+
+//    GLuint indices[] = {
+//         0,  1,  2,  3,  3,     // Face 0 - triangle strip ( v0,  v1,  v2,  v3)
+//         4,  4,  5,  6,  7,  7, // Face 1 - triangle strip ( v4,  v5,  v6,  v7)
+//         8,  8,  9, 10, 11, 11, // Face 2 - triangle strip ( v8,  v9, v10, v11)
+//        12, 12, 13, 14, 15, 15, // Face 3 - triangle strip (v12, v13, v14, v15)
+//        16, 16, 17, 18, 19, 19, // Face 4 - triangle strip (v16, v17, v18, v19)
+//        20, 20, 21, 22, 23      // Face 5 - triangle strip (v20, v21, v22, v23)
+//    };
+
+    QVector<GLuint> indexes;
+    for (int i =0; i < 24; i += 4)
+    {
+        indexes.append(i + 0);
+        indexes.append(i + 1);
+        indexes.append(i + 2);
+
+        indexes.append(i + 2);
+        indexes.append(i + 1);
+        indexes.append(i + 3);
+    }
+
+    indexes.append(17);
+    indexes.append(18);
+    indexes.append(16);
+
+//        indexes.append(17);
+//        indexes.append(18);
+//        indexes.append(19);
+
+
+    //рисуем куб по массиву индексов, храняще муся в VBO1
+    glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, indexes.constData());
+}
+//------------------------------------------------------------------------------
+//процедура отсриовки скайбокса
+//------------------------------------------------------------------------------
+void MyGlWidget::drawSkyBox()
+{
+    //отоключаем буффер глубины
+    glDepthMask(GL_FALSE);
+
+    arrayBuf.bind();
+    //биндим VBO
     //indexBuf.bind();
 
     //загрузим массив координат куба
@@ -356,44 +402,25 @@ void MyGlWidget::drawCube()
     tex_ShaderProg.enableAttributeArray(texcoordLocation);
     tex_ShaderProg.setAttributeBuffer(texcoordLocation, GL_FLOAT, offset, 2, sizeof(VertexData));
 
-    GLushort indices[] = {
-         0,  1,  2,  3,  3,     // Face 0 - triangle strip ( v0,  v1,  v2,  v3)
-         4,  4,  5,  6,  7,  7, // Face 1 - triangle strip ( v4,  v5,  v6,  v7)
-         8,  8,  9, 10, 11, 11, // Face 2 - triangle strip ( v8,  v9, v10, v11)
-        12, 12, 13, 14, 15, 15, // Face 3 - triangle strip (v12, v13, v14, v15)
-        16, 16, 17, 18, 19, 19, // Face 4 - triangle strip (v16, v17, v18, v19)
-        20, 20, 21, 22, 23      // Face 5 - triangle strip (v20, v21, v22, v23)
-    };
 
-    //рисуем куб по массиву индексов, храняще муся в VBO1
-    glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, &indices);
-}
-//------------------------------------------------------------------------------
-//процедура отсриовки скайбокса
-//------------------------------------------------------------------------------
-void MyGlWidget::drawSkyBox()
-{
-    //отоключаем буффер глубины
-    glDepthMask(GL_FALSE);
-
-    arrayBuf.bind();
-
-    //загружаем массив индексво
     QVector<GLuint> indexes;
-    for (int i =0; i < 24;  i +=4) {
+    for (int i =0; i < 24; i += 4)
+    {
         indexes.append(i + 0);
         indexes.append(i + 2);
         indexes.append(i + 1);
 
+        indexes.append(i + 1);
         indexes.append(i + 2);
         indexes.append(i + 3);
-        indexes.append(i + 1);
     }
-
     //рисуем куб по массиву индексов, храняще муся в VBO1
-    glDrawElements(GL_TRIANGLE_STRIP, 34, GL_UNSIGNED_SHORT, &indexes);
+    glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, indexes.constData());
 
     glDepthMask(GL_TRUE);
+
+    arrayBuf.release();
+    //indexBuf.release();
 }
 //------------------------------------------------------------------------------
 //инициализируем фугкиции opnenGl,
@@ -416,10 +443,10 @@ void MyGlWidget::initializeGL()
 
     //рассичтаем геметрию куба
     arrayBuf.create();
-    //indexBuf.create();
+    indexBuf.create();
 
-    //initSkyBoxGeometry();
-    initCubeGeometry();
+    initSkyBoxGeometry();
+    //initCubeGeometry();
 }
 //------------------------------------------------------------------------------
 void MyGlWidget::resizeGL(int w, int h)
@@ -428,7 +455,7 @@ void MyGlWidget::resizeGL(int w, int h)
     glViewport(0,0, w, h);
 
     qreal aspect = qreal(w) / qreal(h ? h : 1);
-    const qreal zNear = 0.1, zFar = 100.0, fov = 60.0;
+    const qreal zNear = 0.5, zFar = 100.0, fov = 60.0;
 
     //утснавливаем парматреы облсти отрсивки
     mPerspective.verticalAngle = fov;
@@ -449,17 +476,17 @@ void MyGlWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_TEXTURE_2D);
 
-    texture->bind();
+    texture->bind(0);
     f->glActiveTexture(GL_TEXTURE0);
 
     //определяем поворот и смещение камеры
     QMatrix4x4 matrix;
     matrix.setToIdentity();
-    matrix.translate(0.0, 0.0, -5.0);
+    matrix.translate(0.0, 0.0, 0.0);
     matrix.rotate(Rotate);
 
     //обновляем парметры перспективной матрицы
-    static QMatrix4x4 mProjectionMat;
+    QMatrix4x4 mProjectionMat;
     mProjectionMat.setToIdentity();
     mProjectionMat.perspective(mPerspective.verticalAngle,
        mPerspective.aspectRatio,
@@ -468,7 +495,7 @@ void MyGlWidget::paintGL()
 
     //конфигурируем мтрицу видового предсатнвления
     //на основе позиции камеры и угла поворота
-    static QMatrix4x4 mViewMat;
+    QMatrix4x4 mViewMat;
     mViewMat.setToIdentity();
     mViewMat.lookAt(mLookAt.eye,
             mLookAt.center,
@@ -484,7 +511,10 @@ void MyGlWidget::paintGL()
     tex_ShaderProg.setUniformValue("texture", 0);
 
     // Draw cube geometry
-    drawCube();
+    drawSkyBox();
+    //drawCube();
+
+    texture->release();
 }
 //------------------------------------------------------------------------------
 void MyGlWidget::mousePressEvent(QMouseEvent *event)
