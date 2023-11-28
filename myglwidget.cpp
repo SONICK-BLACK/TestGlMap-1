@@ -281,28 +281,28 @@ void MyGlWidget::initSkyBoxGeometry()
     //заполяем  указываем вершинные и  текстурные координаты для каждой точки
     VertexData vertices[] = {
         //передняя грань
-        {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(2.0/4.0, 2.0/3.0)},  // v0
-        {QVector3D( 1.0f, -1.0f,  1.0f), QVector2D(2.0/4.0, 1.0/3.0)}, // v1
-        {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(1.0/4.0, 1.0/3.0)},  // v2
+        {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(2.0/4.0, 1.0/3.0)},  // v0
+        {QVector3D( 1.0f, -1.0f,  1.0f), QVector2D(1.0/4.0, 1.0/3.0)}, // v1
+        {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(2.0/4.0, 2.0/3.0)},  // v2
         {QVector3D( 1.0f,  1.0f,  1.0f), QVector2D(1.0/4.0, 2.0/3.0)}, // v3
 
-        //правая грань
-        {QVector3D( 1.0f, -1.0f,  1.0f), QVector2D(2.0/4.0, 2.0/3.0)}, // v4
-        {QVector3D( 1.0f, -1.0f, -1.0f), QVector2D(2.0/4.0, 1.0/3.0)}, // v5
-        {QVector3D( 1.0f,  1.0f,  1.0f), QVector2D(3.0/4.0, 1.0/3.0)},  // v6
-        {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(3.0/4.0, 2.0/3.0)}, // v7
+        //левая грань
+        {QVector3D( 1.0f, -1.0f,  1.0f), QVector2D(1.0/4.0, 1.0/3.0)}, // v4
+        {QVector3D( 1.0f, -1.0f, -1.0f), QVector2D(0.0f, 1.0/3.0)}, // v5
+        {QVector3D( 1.0f,  1.0f,  1.0f), QVector2D(1.0/4.0, 2.0/3.0)},  // v6
+        {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.0f, 2.0/3.0)}, // v7
 
         //задняя грань
-        {QVector3D( 1.0f, -1.0f, -1.0f), QVector2D(0.66f, 0.5f)}, // v8
-        {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(1.0f, 0.5f)},  // v9
-        {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(0.66f, 1.0f)}, // v10
-        {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(1.0f, 1.0f)},  // v11
+        {QVector3D( 1.0f, -1.0f, -1.0f), QVector2D(1.0f, 1.0/3.0)}, // v8
+        {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(3.0/4.0, 1.0/3.0)},  // v9
+        {QVector3D( 1.0f,  1.0f, -1.0f), QVector2D(1.0f, 2.0/3.0)}, // v10
+        {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(3.0/4.0, 2.0/3.0)},  // v11
 
-        //левая грань
-        {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(1.0/4.0, 2.0/3.0)}, // v12
-        {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(1.0/4.0, 2.0/3.0)},  // v13
-        {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(0, 1.0/3.0)}, // v14
-        {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(0, 2.0/3.0)},  // v15
+        //правая грань
+        {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(3.0/4.0, 1.0/3.0)}, // v12
+        {QVector3D(-1.0f, -1.0f,  1.0f), QVector2D(2.0/4.0, 1.0/3.0)},  // v13
+        {QVector3D(-1.0f,  1.0f, -1.0f), QVector2D(3.0/4.0, 2.0/3.0)}, // v14
+        {QVector3D(-1.0f,  1.0f,  1.0f), QVector2D(2.0/4.0, 2.0/3.0)},  // v15
 
         //нижняя грань
         {QVector3D(-1.0f, -1.0f, -1.0f), QVector2D(2.0/4.0, 1.0f)}, // v16
@@ -385,8 +385,6 @@ void MyGlWidget::drawSkyBox()
     glDepthMask(GL_FALSE);
 
     arrayBuf.bind();
-    //биндим VBO
-    //indexBuf.bind();
 
     //загрузим массив координат куба
     quintptr offset = 0;
