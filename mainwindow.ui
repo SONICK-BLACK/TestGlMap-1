@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>764</width>
-    <height>827</height>
+    <width>828</width>
+    <height>906</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,17 +26,7 @@
         </item>
         <item>
          <property name="text">
-          <string>ГК1</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>ГК2</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>ГК3</string>
+          <string>ГК</string>
          </property>
         </item>
        </widget>
@@ -115,13 +105,17 @@
         </layout>
        </item>
        <item>
-        <widget class="MapWidget" name="widget_Map" native="true">
-         <property name="minimumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
+        <widget class="QStackedWidget" name="stackedWidget_Map">
+         <property name="font">
+          <font>
+           <pointsize>13</pointsize>
+          </font>
          </property>
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="page"/>
+         <widget class="MapWidget" name=""/>
         </widget>
        </item>
       </layout>
@@ -232,7 +226,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>764</width>
+     <width>828</width>
      <height>26</height>
     </rect>
    </property>
