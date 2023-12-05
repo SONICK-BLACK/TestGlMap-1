@@ -40,10 +40,10 @@ void MapWidget::SetImage(QString image_name)
     update();
 }
 //------------------------------------------------------------------------------
-void MapWidget::SetPointsList(TPointList *ptr_list)
+void MapWidget::SetPointsList(const QList<TMapPoint> &ptr_list)
 {
-    if (ptr_list != NULL)
-        ptList =  ptr_list;
+    //if (ptr_list != NULL)
+    //ptList =  ptr_list;
 
     //воздмонжо тут стоит вызваать обновление statck_widgeta
     //popup виджета с сооветсвие с текйшим набором точек
@@ -123,8 +123,6 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
 {
     event->accept();
 
-    if (ptList == NULL) return;
-
     if (FindedPt)
     {
         FindedPt = false;
@@ -138,30 +136,30 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
 
     int cur_point = -1;
 
-    for (int i = 0; i < ptList->length(); i++)
-    {
-        //переовдим координты точек в координаты вджета
-        QPoint m_point = QPoint((double)ptList->at(i).p_pos.x() * ImgXKoff,
-            (double)ptList->at(i).p_pos.y() * ImgYKoff);
+//    for (int i = 0; i < ptList.length(); i++)
+//    {
+//        //переовдим координты точек в координаты вджета
+//        QPoint m_point = QPoint((double)ptList.at(i).p_pos.x() * ImgXKoff,
+//            (double)ptList.at(i).p_pos.y() * ImgYKoff);
 
-        //если курсор поапл в облатсь точки
-        if (view_rect.contains(m_point))
-        {
-            cur_point = i;
-            break;
-        }
-    }
+//        //если курсор поапл в облатсь точки
+//        if (view_rect.contains(m_point))
+//        {
+//            cur_point = i;
+//            break;
+//        }
+//    }
 
-    popupWidget->setVisible(cur_point != -1);
-    if (popupWidget->isVisible())
-    {
-        popupWidget->setPoint(ptList->at(cur_point));
-        QSize w_size  = popupWidget->size();
-        QPoint w_point = QPoint(clicked_pt.x() - popupWidget->width() / 2,
-            clicked_pt.y() - popupWidget->height());
+//    popupWidget->setVisible(cur_point != -1);
+//    if (popupWidget->isVisible())
+//    {
+//        popupWidget->setPoint(ptList.at(cur_point));
+//        QSize w_size  = popupWidget->size();
+//        QPoint w_point = QPoint(clicked_pt.x() - popupWidget->width() / 2,
+//            clicked_pt.y() - popupWidget->height());
 
-        popupWidget->setGeometry(QRect(mapToGlobal(w_point), w_size));
-    }
+//        popupWidget->setGeometry(QRect(mapToGlobal(w_point), w_size));
+//    }
 }
 //------------------------------------------------------------------------------
 /*void MapWidget::mouseMoveEvent(QMouseEvent *event)

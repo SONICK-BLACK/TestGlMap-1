@@ -22,7 +22,10 @@ public:
     ~MapWidget();
 
     void SetImage(QString image_name);
-    void SetPointsList(TPointList *ptr_list);
+    void SetPointsList(const  QList<TMapPoint> &ptr_list);
+
+//    TPointList GetPointsList() const;
+//    QImage GetImage() const;
 
     void ShowPopup(TMapPoint pt);
 

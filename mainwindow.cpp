@@ -12,11 +12,14 @@ MainWindow::MainWindow(QWidget *parent) :
     LoadMapParams();
 
     ui->setupUi(this);
+
     //ui->widget_Map->setMap(&CurrentMap);
 
-    //ui->label_Korpus->setVisible(false);
-    ui->openGLWidget->setVisible(false);
-    //ui->frame_Map->setVisible(true);
+    ui->openGLWidget->setVisible(true);
+    ui->lineEdit_search->setVisible(false);
+    ui->pushButton_Search->setVisible(false);
+    ui->frame_Map->setVisible(true);
+
     //ui->label_Korpus->setScaledContents(true);
     //ui->stackedWidget_Map->addWidget(new QWidget(this));
 
@@ -25,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(setCurrentMap(int)));
 
     //connect(ui->widget_Map->popupWidget, SIGNAL(ShowPoint(TMapPoint)), this, SLOT(ShowPoint(TMapPoint)));
+
 //    connect(ui->pushButton_Search, SIGNAL(clicked(bool)), this, SLOT(FindPoint(QString&)))
     connect(ui->lineEdit_search, SIGNAL(textChanged(QString)), this, SLOT(FindPoint(QString)));
 
@@ -48,7 +52,7 @@ void MainWindow::LoadMapParams()
     };
 
     QList<TPointList> p_lst =  {kpoints};
-    QStringList n_lst = {QString(":/map1/campus_map.png")};
+    QStringList n_lst = {QString(":/map1/campus_map_markless.png")};
 
     TMap Kampus(1, n_lst, p_lst);
     Maps.append(Kampus);
@@ -156,11 +160,11 @@ void MainWindow::setCurrentMap(int index)
     {
         MapWidget *lay_widget = static_cast<MapWidget*>(ui->stackedWidget_Map->widget(l));
         lay_widget->SetImage(CurrentMap.images.at(l));
+        //константная ссылка
+        const QList<TMapPoint> &f_ptr = CurrentMap.l_points.at(l);
+        lay_widget->SetPointsList(f_ptr);
 
         qDebug() << "laver " << l;
-
-//        TPointList *pt_lst = static_cast<TPointList*>(&CurrentMap.l_points.at(l));
-//        lay_widget->SetPointsList(pt_lst);
     }
 }
 //-----------------------------------------------------------------------------
@@ -174,6 +178,26 @@ void MainWindow::on_pushButton_Search_clicked()
 {
     QString pt_name = ui->lineEdit_search->text();
     FindPoint(pt_name);
+
+
+}
+//------------------------------------------------------------------------------
+//перелючим элменты стек-виджета
+//------------------------------------------------------------------------------
+void MainWindow::on_pushButton_pop_clicked()
+{
+    int idx  = ui->stackedWidget_Map->currentIndex()-1;
+    if (idx < 0) idx = 0;
+
+    ui->stackedWidget_Map->setCurrentIndex(idx);
+}
+//------------------------------------------------------------------------------
+void MainWindow::on_pushButton_push_clicked()
+{
+    int idx  = ui->stackedWidget_Map->currentIndex()+1;
+    if (idx > ui->stackedWidget_Map->count()) idx = ui->stackedWidget_Map->count();
+
+    ui->stackedWidget_Map->setCurrentIndex(idx);
 }
 //------------------------------------------------------------------------------
 //выосетим тескеит посика

@@ -18,6 +18,13 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="text">
+         <string>PushButton</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QComboBox" name="comboBox">
         <item>
          <property name="text">
@@ -105,6 +112,37 @@
         </layout>
        </item>
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_pop">
+           <property name="text">
+            <string>&lt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_push">
+           <property name="text">
+            <string>&gt;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
         <widget class="QStackedWidget" name="stackedWidget_Map">
          <property name="font">
           <font>
@@ -112,10 +150,8 @@
           </font>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>-1</number>
          </property>
-         <widget class="QWidget" name="page"/>
-         <widget class="MapWidget" name=""/>
         </widget>
        </item>
       </layout>
@@ -247,12 +283,6 @@
    <class>MyGlWidget</class>
    <extends>QOpenGLWidget</extends>
    <header>myglwidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>MapWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">mapwidget.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
