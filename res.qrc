@@ -34,5 +34,7 @@
         <file>map1/DSC_0203.JPG</file>
         <file>map_gl_fl1/p_ipt.JPG</file>
         <file>map_gl_fl1/p_smth.JPG</file>
+        <file>map1/campus_map.png</file>
+        <file>map1/campus_map_markless.png</file>
     </qresource>
 </RCC>

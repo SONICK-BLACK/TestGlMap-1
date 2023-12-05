@@ -25,6 +25,7 @@ public:
 
     void LoadMapParams();
 
+
     void resizeEvent(QResizeEvent *event);
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -34,6 +35,7 @@ public:
 private slots:
     void ShowPoint(TMapPoint point);
     void FindPoint(QString name);
+    void setCurrentMap(int index);
 
 
     void on_toolButton_return_clicked();
@@ -45,12 +47,13 @@ private slots:
 //    void on_pushButton_m_clicked();
 
     void on_pushButton_Z_clicked();
-
     void on_pushButton_m_clicked();
-
     void on_pushButton_clicked();
 
-    void on_comboBox_activated(int index);
+
+    void on_pushButton_pop_clicked();
+
+    void on_pushButton_push_clicked();
 
 private:
     Ui::MainWindow *ui;

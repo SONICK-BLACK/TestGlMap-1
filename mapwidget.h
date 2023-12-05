@@ -1,7 +1,7 @@
 #ifndef MAPWIDGET_H
 #define MAPWIDGET_H
 //------------------------------------------------------------------------------
-//виджет для отрисовки map-ов
+//виджет для отрисовки слоя
 //------------------------------------------------------------------------------
 #include <QWidget>
 #include "mainwindow.h"
@@ -21,18 +21,25 @@ public:
     explicit MapWidget(QWidget *parent = nullptr);
     ~MapWidget();
 
-    void setMap(TMap *map);
-    //void ShowPopup(QPoint pt);
+    void SetImage(QString image_name);
+    void SetPointsList(const  QList<TMapPoint> &ptr_list);
+
+//    TPointList GetPointsList() const;
+//    QImage GetImage() const;
+
     void ShowPopup(TMapPoint pt);
+
     void resizeEvent(QResizeEvent *event);
     void paintEvent(QPaintEvent *event);
+
     void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
+    //void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
 private :
-    TMap *CurrentMap;
     QImage *SourceMapImage;
+    TPointList *ptList;
+
     //полигон метки
     QPolygon mark_poly;
     //прямоугольнник отрисовываемоого учатска карыт
@@ -42,8 +49,7 @@ private :
     //сброс т возжмене тоьлок при надатии мыши
     bool FindedPt;
 
-    //коэффиценты отношения размеров
-    //исходного QImage к размерам виджета
+    //коэффиценты отношения размеров  исходного QImage к размерам виджета
     double ImgXKoff;
     double ImgYKoff;
 
