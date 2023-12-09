@@ -22,7 +22,7 @@ public:
     ~MapWidget();
 
     void SetImage(QString image_name);
-    void SetPointsList(const  QList<TMapPoint> &ptr_list);
+    void SetPointsList( QList<TMapPoint> *ptr_list);
 
 //    TPointList GetPointsList() const;
 //    QImage GetImage() const;
@@ -38,7 +38,7 @@ public:
 
 private :
     QImage *SourceMapImage;
-    TPointList *ptList;
+     TPointList *ptList;
 
     //полигон метки
     QPolygon mark_poly;

@@ -40,10 +40,12 @@ void MapWidget::SetImage(QString image_name)
     update();
 }
 //------------------------------------------------------------------------------
-void MapWidget::SetPointsList(const QList<TMapPoint> &ptr_list)
+void MapWidget::SetPointsList( QList<TMapPoint>* ptr_list)
 {
     //if (ptr_list != NULL)
-    //ptList =  ptr_list;
+   // QList<TMapPoint> *ptr;
+    //ptr = ptr_list;
+    ptList = ptr_list;
 
     //воздмонжо тут стоит вызваать обновление statck_widgeta
     //popup виджета с сооветсвие с текйшим набором точек

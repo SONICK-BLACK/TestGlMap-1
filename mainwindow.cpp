@@ -161,8 +161,10 @@ void MainWindow::setCurrentMap(int index)
         MapWidget *lay_widget = static_cast<MapWidget*>(ui->stackedWidget_Map->widget(l));
         lay_widget->SetImage(CurrentMap.images.at(l));
         //константная ссылка
-        const QList<TMapPoint> &f_ptr = CurrentMap.l_points.at(l);
-        lay_widget->SetPointsList(f_ptr);
+       QList<TMapPoint> f_ptr = CurrentMap.l_points.at(l);
+         QList<TMapPoint>* f;
+         f=&f_ptr;
+        lay_widget->SetPointsList(f);
 
         qDebug() << "laver " << l;
     }
